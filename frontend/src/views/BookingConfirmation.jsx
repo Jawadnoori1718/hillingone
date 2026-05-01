@@ -6,7 +6,7 @@ export default function BookingConfirmation({ booking, asset, onBack, encouragem
   const endTime = new Date(booking.end_time);
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-8">
+    <div className="max-w-2xl mx-auto px-4 md:px-6 py-6 md:py-8">
       <button onClick={onBack} className="flex items-center gap-1 text-sm text-gray-600 hover:text-[#2A5C5A] mb-6">
         <ArrowLeft size={16} /> Back to search
       </button>
@@ -32,7 +32,7 @@ export default function BookingConfirmation({ booking, asset, onBack, encouragem
             <div className="text-sm text-gray-600">{asset.ward}, Hillingdon</div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <div className="text-xs text-gray-500 uppercase tracking-wide">When</div>
               <div className="text-sm font-medium text-gray-900">

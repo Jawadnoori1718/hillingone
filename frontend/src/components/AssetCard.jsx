@@ -21,9 +21,9 @@ export default function AssetCard({ match, onBook, booking = false, disabled = f
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-[#2A5C5A] hover:shadow-md transition group">
-      <div className="flex gap-0">
+      <div className="flex flex-col sm:flex-row gap-0">
         {/* Image */}
-        <div className="w-36 h-full min-h-[160px] flex-shrink-0 relative overflow-hidden">
+        <div className="w-full h-36 sm:w-36 sm:h-auto sm:min-h-[160px] flex-shrink-0 relative overflow-hidden">
           {asset.image_url && !imgError ? (
             <img
               src={asset.image_url}

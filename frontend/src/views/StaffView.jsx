@@ -4,10 +4,43 @@ import {
   Bell, Activity, MapPin, AlertTriangle, Clock, ShieldCheck,
   RefreshCw, Users, Play, X, Loader2, AlertCircle, ChevronDown,
   ChevronRight, CheckCircle2, BarChart3, ArrowRight, Cpu, Zap,
-  Package, MessageSquare,
+  Package, MessageSquare, Menu,
 } from "lucide-react";
 import { HillingOneIcon, HillingOneWordmark } from "../components/HillingOneLogo";
 import { api } from "../api/client";
+
+// ─── Mobile bottom nav ───────────────────────────────────────────────────────
+function MobileNav({ active, onNav, onLogout }) {
+  const items = [
+    { id: "dashboard",  label: "Home",      icon: LayoutDashboard },
+    { id: "bookings",   label: "Bookings",  icon: CalendarDays },
+    { id: "agent-runs", label: "Agents",    icon: Bot },
+    { id: "analytics",  label: "Analytics", icon: BarChart3 },
+  ];
+  return (
+    <nav className="md:hidden flex-shrink-0 bg-white border-t border-gray-200 flex items-center justify-around px-2 py-1">
+      {items.map(({ id, label, icon: Icon }) => (
+        <button
+          key={id}
+          onClick={() => onNav(id)}
+          className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all ${
+            active === id ? "text-[#2A5C5A]" : "text-gray-400 hover:text-gray-600"
+          }`}
+        >
+          <Icon size={20} strokeWidth={active === id ? 2.5 : 1.8} />
+          <span className="text-[10px] font-medium">{label}</span>
+        </button>
+      ))}
+      <button
+        onClick={onLogout}
+        className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-gray-400 hover:text-red-500 transition-all"
+      >
+        <LogOut size={20} strokeWidth={1.8} />
+        <span className="text-[10px] font-medium">Out</span>
+      </button>
+    </nav>
+  );
+}
 
 // ─── Top bar ────────────────────────────────────────────────────────────────
 function TopBar({ user, notifications, onClearNotification }) {
@@ -15,7 +48,12 @@ function TopBar({ user, notifications, onClearNotification }) {
   const count = notifications.length;
 
   return (
-    <header className="h-14 bg-white border-b border-gray-200 flex items-center px-6 gap-4 flex-shrink-0">
+    <header className="h-14 bg-white border-b border-gray-200 flex items-center px-3 md:px-6 gap-3 flex-shrink-0">
+      {/* Logo on mobile */}
+      <div className="md:hidden flex items-center gap-2 mr-1">
+        <HillingOneIcon size={28} variant="dark" />
+        <span className="text-xs font-bold text-gray-700">Staff</span>
+      </div>
       <div className="flex-1" />
 
       {/* Notification bell */}
@@ -89,7 +127,7 @@ const NAV = [
 
 function Sidebar({ active, onNav, onLogout }) {
   return (
-    <aside className="w-60 flex-shrink-0 bg-[#1D4442] flex flex-col h-full">
+    <aside className="hidden md:flex w-60 flex-shrink-0 bg-[#1D4442] flex-col h-full">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-white/10">
         <div className="flex items-center gap-2.5">
@@ -226,7 +264,7 @@ export default function StaffView({ user, onLogout, onAgentRun, notifications, o
     <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar active={page} onNav={setPage} onLogout={onLogout} />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         <TopBar user={user} notifications={notifications} onClearNotification={onClearNotification} />
 
         <main className="flex-1 overflow-y-auto">
@@ -267,6 +305,7 @@ export default function StaffView({ user, onLogout, onAgentRun, notifications, o
             />
           )}
         </main>
+        <MobileNav active={page} onNav={setPage} onLogout={onLogout} />
       </div>
 
       {agentModal && (
@@ -284,7 +323,7 @@ export default function StaffView({ user, onLogout, onAgentRun, notifications, o
 
       {/* Toast for background agent completions */}
       {agentToast && (
-        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium border ${
+        <div className={`fixed bottom-20 md:bottom-6 right-4 left-4 md:left-auto md:right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium border ${
           agentToast.ok
             ? "bg-emerald-50 border-emerald-200 text-emerald-800"
             : "bg-red-50 border-red-200 text-red-800"
@@ -446,7 +485,7 @@ function DashboardPage({ data, loading, error, onRetry, onRefresh, agentsStatus,
   const m = data.metrics;
 
   return (
-    <div className="px-6 py-6 space-y-6 max-w-[1200px]">
+    <div className="px-4 md:px-6 py-4 md:py-6 space-y-5 md:space-y-6 max-w-[1200px]">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -612,8 +651,8 @@ function BookingsPage({ bookings, loading, onRefresh, onRunAgent }) {
     : bookings.filter((b) => b.state === stateFilter);
 
   return (
-    <div className="px-6 py-6 space-y-5 max-w-[1200px]">
-      <div className="flex items-center justify-between">
+    <div className="px-4 md:px-6 py-4 md:py-6 space-y-5 max-w-[1200px]">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">All Bookings</h1>
           <p className="text-sm text-gray-500 mt-0.5">Review all bookings — click "Resolve" on any confirmed booking to let the AI handle a conflict</p>
@@ -621,14 +660,15 @@ function BookingsPage({ bookings, loading, onRefresh, onRunAgent }) {
         <button
           onClick={onRefresh}
           disabled={loading}
-          className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition"
+          className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition self-start sm:self-auto"
         >
           <RefreshCw size={13} className={loading ? "animate-spin" : ""} /> Refresh
         </button>
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
+      <div className="overflow-x-auto -mx-1 px-1">
+      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit min-w-max">
         {tabs.map((t) => (
           <button
             key={t}
@@ -640,6 +680,7 @@ function BookingsPage({ bookings, loading, onRefresh, onRunAgent }) {
             {t === "all" ? "All" : STATE_LABELS[t] || t}
           </button>
         ))}
+      </div>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
@@ -763,15 +804,15 @@ function AgentRunsPage({ runs, loading, onRefresh, onViewRun }) {
   }
 
   return (
-    <div className="px-6 py-6 space-y-5 max-w-[900px]">
-      <div className="flex items-center justify-between">
+    <div className="px-4 md:px-6 py-4 md:py-6 space-y-5 max-w-[900px]">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Agent Runs</h1>
           <p className="text-sm text-gray-500 mt-0.5">A plain-English log of everything the AI has done — fully transparent</p>
         </div>
         <button
           onClick={onRefresh}
-          className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition"
+          className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition self-start sm:self-auto"
         >
           <RefreshCw size={13} /> Refresh
         </button>
@@ -967,7 +1008,7 @@ function DemandSection({ report }) {
           <div className="divide-y divide-gray-100">
             {a.peak_times.map((t, i) => (
               <div key={i} className="px-5 py-3 flex items-center gap-4">
-                <div className="text-xs font-mono font-semibold text-gray-900 w-44 flex-shrink-0">{t.time_window}</div>
+                <div className="text-xs font-mono font-semibold text-gray-900 w-28 sm:w-44 flex-shrink-0">{t.time_window}</div>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium">{t.demand_level}</span>
                 <div className="text-xs text-gray-600 flex-1">{t.suggestion}</div>
               </div>
@@ -1032,7 +1073,7 @@ function InventorySection({ report }) {
 
       {/* Health score + stats */}
       {(stats || a.portfolio_health_score != null) && (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-white border border-gray-200 rounded-xl p-4 text-center">
             <div className="text-3xl font-bold text-[#2A5C5A]">{a.portfolio_health_score ?? "—"}</div>
             <div className="text-xs text-gray-500 mt-0.5">Portfolio health score</div>
@@ -1152,14 +1193,15 @@ function AnalyticsPage({ data, loading, demandReport, inventoryReport }) {
   const utilisation = data?.asset_utilisation || [];
 
   return (
-    <div className="px-6 py-6 space-y-5 max-w-[960px]">
+    <div className="px-4 md:px-6 py-4 md:py-6 space-y-5 max-w-[960px]">
       <div>
         <h1 className="text-xl font-bold text-gray-900">Demand Analytics</h1>
         <p className="text-sm text-gray-500 mt-0.5">Understand what residents need and how well spaces are used</p>
       </div>
 
       {/* Tab switcher */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
+      <div className="overflow-x-auto -mx-1 px-1">
+      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit min-w-max">
         {[
           { id: "demand", label: "What residents need" },
           { id: "inventory", label: "How spaces are used" },
@@ -1175,6 +1217,7 @@ function AnalyticsPage({ data, loading, demandReport, inventoryReport }) {
             {label}
           </button>
         ))}
+      </div>
       </div>
 
       {tab === "demand" && <DemandSection report={demandReport} />}
@@ -1298,10 +1341,10 @@ function AgentTriggerModal({ booking, onClose, onAgentRun }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center sm:p-4">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-lg max-h-[92dvh] overflow-y-auto">
         {/* Header */}
-        <div className="bg-[#1D4442] text-white p-5 rounded-t-2xl flex items-start justify-between">
+        <div className="bg-[#1D4442] text-white p-5 rounded-t-2xl flex items-start justify-between sticky top-0 z-10">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-white/15 rounded-lg flex items-center justify-center">
               <Bot size={20} />

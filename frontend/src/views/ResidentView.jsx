@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Search, CalendarDays, HelpCircle, LogOut,
   Bell, Sparkles, Network, ArrowLeft, CheckCircle2, AlertTriangle,
   Clock, Calendar, X, Loader2, RefreshCw, ChevronRight, ChevronDown,
-  BookOpen, Phone, Mail, MapPin,
+  BookOpen, Phone, Mail, MapPin, Menu,
 } from "lucide-react";
 import SearchBox from "../components/SearchBox";
 import AssetCard from "../components/AssetCard";
@@ -28,7 +28,7 @@ function Sidebar({ active, onNavigate, onLogout }) {
   ];
 
   return (
-    <aside className="w-60 h-full bg-[#1D4442] flex flex-col flex-shrink-0">
+    <aside className="hidden md:flex w-60 h-full bg-[#1D4442] flex-col flex-shrink-0">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-white/10">
         <div className="flex items-center gap-2.5">
@@ -69,6 +69,39 @@ function Sidebar({ active, onNavigate, onLogout }) {
   );
 }
 
+// ─── Mobile bottom nav ────────────────────────────────────────────────────────
+function MobileNav({ active, onNavigate, onLogout }) {
+  const nav = [
+    { key: "dashboard", icon: LayoutDashboard, label: "Home" },
+    { key: "book",      icon: Search,          label: "Book" },
+    { key: "bookings",  icon: CalendarDays,    label: "Bookings" },
+    { key: "help",      icon: HelpCircle,      label: "Help" },
+  ];
+  return (
+    <nav className="md:hidden flex-shrink-0 bg-white border-t border-gray-200 flex items-center justify-around px-2 py-1 safe-bottom">
+      {nav.map(({ key, icon: Icon, label }) => (
+        <button
+          key={key}
+          onClick={() => onNavigate(key)}
+          className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all ${
+            active === key ? "text-[#2A5C5A]" : "text-gray-400 hover:text-gray-600"
+          }`}
+        >
+          <Icon size={20} strokeWidth={active === key ? 2.5 : 1.8} />
+          <span className={`text-[10px] font-medium ${active === key ? "text-[#2A5C5A]" : ""}`}>{label}</span>
+        </button>
+      ))}
+      <button
+        onClick={onLogout}
+        className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-gray-400 hover:text-red-500 transition-all"
+      >
+        <LogOut size={20} strokeWidth={1.8} />
+        <span className="text-[10px] font-medium">Out</span>
+      </button>
+    </nav>
+  );
+}
+
 // ─── Top bar ──────────────────────────────────────────────────────────────────
 function TopBar({ title, subtitle, action, notifications, onClearNotification, user }) {
   const [showNotifs, setShowNotifs] = useState(false);
@@ -84,10 +117,14 @@ function TopBar({ title, subtitle, action, notifications, onClearNotification, u
   const initials = user?.name?.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) ?? "?";
 
   return (
-    <div className="h-14 flex items-center px-6 border-b border-gray-200 bg-white flex-shrink-0 gap-4">
+    <div className="h-14 flex items-center px-3 md:px-6 border-b border-gray-200 bg-white flex-shrink-0 gap-2 md:gap-4">
+      {/* Logo on mobile (sidebar is hidden) */}
+      <div className="md:hidden flex items-center gap-2 mr-1">
+        <HillingOneIcon size={28} variant="dark" />
+      </div>
       <div className="flex-1 min-w-0">
-        <h1 className="text-base font-bold text-gray-900 truncate">{title}</h1>
-        {subtitle && <p className="text-xs text-gray-500 truncate">{subtitle}</p>}
+        <h1 className="text-sm md:text-base font-bold text-gray-900 truncate">{title}</h1>
+        {subtitle && <p className="hidden sm:block text-xs text-gray-500 truncate">{subtitle}</p>}
       </div>
 
       <div className="flex items-center gap-3 flex-shrink-0">
@@ -160,10 +197,10 @@ function DashboardHome({ user, myBookings, bookingsLoading, onNavigate, onBookin
   const next = [...upcoming].sort((a, b) => new Date(a.start_time) - new Date(b.start_time))[0];
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-4 md:p-8 space-y-5 md:space-y-8">
       {/* Welcome */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900">
           Welcome back, {user.name.split(" ")[0]}
         </h2>
         <p className="text-gray-500 mt-0.5">
@@ -216,7 +253,7 @@ function DashboardHome({ user, myBookings, bookingsLoading, onNavigate, onBookin
         <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
         {/* Gold accent bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-[#EAB830] rounded-t-2xl" />
-        <div className="relative flex items-start justify-between gap-4">
+        <div className="relative flex flex-col sm:flex-row items-start sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-6 h-6 bg-[#EAB830] rounded-full flex items-center justify-center">
@@ -226,12 +263,12 @@ function DashboardHome({ user, myBookings, bookingsLoading, onNavigate, onBookin
             </div>
             <h3 className="text-xl font-bold mb-1">Find a Space</h3>
             <p className="text-sm text-white/70">
-              Describe what you need in plain English. Atrium searches the entire borough instantly.
+              Describe what you need in plain English and we'll find the right space instantly.
             </p>
           </div>
           <button
             onClick={() => onNavigate("book")}
-            className="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 bg-[#EAB830] text-[#1D4442] rounded-xl text-sm font-bold hover:bg-[#F0C840] transition shadow-sm"
+            className="w-full sm:w-auto flex-shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 bg-[#EAB830] text-[#1D4442] rounded-xl text-sm font-bold hover:bg-[#F0C840] transition shadow-sm"
           >
             Book a Space
             <ChevronRight size={14} />
@@ -289,8 +326,8 @@ function MyBookingsPage({ myBookings, bookingsLoading, onRefresh, onBookingActio
     : myBookings.filter((b) => b.state === filter);
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 md:p-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
         <div>
           <h2 className="text-xl font-bold text-gray-900">My Bookings</h2>
           <p className="text-sm text-gray-500 mt-0.5">
@@ -315,7 +352,7 @@ function MyBookingsPage({ myBookings, bookingsLoading, onRefresh, onBookingActio
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2 mb-5">
+      <div className="flex flex-wrap gap-2 mb-5">
         {["all", "confirmed", "swap_pending", "completed"].map((f) => (
           <button
             key={f}
@@ -507,7 +544,7 @@ function HelpPage() {
   ];
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="p-4 md:p-6 max-w-2xl">
       <h2 className="text-xl font-bold text-gray-900 mb-1">Help & Support</h2>
       <p className="text-sm text-gray-500 mb-5">Everything you need to know</p>
 
@@ -585,7 +622,7 @@ function DateTimePicker({ date, setDate, time, setTime, duration, setDuration })
         <span className="text-sm font-bold text-white uppercase tracking-wide">When do you need it?</span>
       </div>
       {/* Selects */}
-      <div className="bg-white px-5 py-4 grid grid-cols-3 gap-4">
+      <div className="bg-white px-4 py-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-xs font-semibold text-[#2A5C5A] mb-1.5 uppercase tracking-wide">Date</label>
           <select value={date} onChange={(e) => setDate(e.target.value)} className={selectCls}>
@@ -724,7 +761,7 @@ function BookASpace({ user, onConfirmed }) {
   if (stage === "results") {
     const win = fmtWindow(searchWindow);
     return (
-      <div className="p-6 max-w-3xl">
+      <div className="p-4 md:p-6 max-w-3xl">
         <button onClick={reset} className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#2A5C5A] mb-5 transition">
           <ArrowLeft size={14} /> Start over
         </button>
@@ -794,19 +831,19 @@ function BookASpace({ user, onConfirmed }) {
   }
 
   if (stage === "hold") return (
-    <div className="p-6 max-w-xl mx-auto">
+    <div className="p-4 md:p-6 max-w-xl mx-auto">
       <HoldScreen booking={holdBooking} asset={holdAsset} onConfirm={handleConfirm} onCancel={reset} error={error} searchWindow={searchWindow} />
     </div>
   );
 
   if (stage === "confirmed") return (
-    <div className="p-6">
+    <div className="p-4 md:p-6">
       <BookingConfirmation booking={confirmed} asset={holdAsset} onBack={() => { reset(); onConfirmed?.(); }} encouragement={encouragement} remindersScheduled={remindersCount} />
     </div>
   );
 
   return (
-    <div className="p-6 max-w-3xl">
+    <div className="p-4 md:p-6 max-w-3xl">
       {error && (
         <div className="mb-4 flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl p-3">
           <AlertTriangle size={14} className="flex-shrink-0" />{error}
@@ -978,7 +1015,7 @@ export default function ResidentView({ user, onLogout, notifications, onClearNot
             page !== "book" ? (
               <button
                 onClick={() => setPage("book")}
-                className="flex items-center gap-2 px-4 py-2 bg-[#2A5C5A] text-white rounded-lg text-sm font-bold hover:bg-[#2A5C5A]/90 transition"
+                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#2A5C5A] text-white rounded-lg text-sm font-bold hover:bg-[#2A5C5A]/90 transition"
               >
                 <Search size={14} /> Quick Book
               </button>
@@ -1013,6 +1050,7 @@ export default function ResidentView({ user, onLogout, notifications, onClearNot
           )}
           {page === "help" && <HelpPage />}
         </main>
+        <MobileNav active={page} onNavigate={setPage} onLogout={onLogout} />
       </div>
     </div>
   );
