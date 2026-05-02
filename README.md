@@ -110,11 +110,3 @@ Or click **Demo: Resident** / **Demo: Staff** on the login screen — no passwor
 | API Docs | https://hillingone-backend.onrender.com/docs |
 
 > The backend is on Render's free tier and may take 30–50 seconds to wake up on first visit.
-
----
-
-## 👨‍💻 Author
-
-**Jawad Noori**  
-Computer Science Student & Aspiring Software Engineer  
-GitHub: https://github.com/Jawadnoori1718
